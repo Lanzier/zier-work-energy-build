@@ -1,5 +1,8 @@
 name: Build macOS installers
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
 
@@ -30,3 +33,9 @@ jobs:
           name: Zier-Work-Energy-Bar-macOS-${{ matrix.arch }}
           path: dist/*.dmg
           if-no-files-found: error
+      - name: Publish DMG to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.4.1
+          name: Zier Work Energy Bar v2.4.1
+          files: dist/*.dmg
