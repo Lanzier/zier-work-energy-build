@@ -1,0 +1,56 @@
+{
+  "name": "zier-work-energy-bar",
+  "version": "2.4.1",
+  "description": "带城市天气、工作电量与 TweakCN 社区主题的桌面倒计时插件",
+  "author": "Zier",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "screenshot": "electron . --screenshot",
+    "dist:win": "electron-builder --win nsis --x64",
+    "dist:mac": "electron-builder --mac dmg --x64 --arm64",
+    "dist:folder": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.zier.workenergybar",
+    "productName": "Zier工作能量条",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "renderer/**/*", "assets/**/*", "package.json"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false,
+      "artifactName": "Zier-Work-Energy-Bar-Setup-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerSidebar": "assets/installer-sidebar.bmp",
+      "installerHeader": "assets/installer-header.bmp",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Zier工作能量条",
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "Zier-Work-Energy-Bar-${version}-macOS-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "Zier工作能量条 ${version}",
+      "iconSize": 112,
+      "contents": [
+        { "x": 150, "y": 190, "type": "file" },
+        { "x": 410, "y": 190, "type": "link", "path": "/Applications" }
+      ]
+    }
+  }
+}

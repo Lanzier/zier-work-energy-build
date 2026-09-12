@@ -1,0 +1,19 @@
+html body .drawer{height:408px!important}
+html body .footer-note{min-height:25px!important;flex:0 0 25px!important;padding:0 2px}
+html[data-theme="custom"] body .clock-copy b,
+html[data-theme="custom"] body .weather-card b,
+html[data-theme="custom"] body .settings b,
+html[data-theme="custom"] body .section-title b,
+html[data-theme="custom"] body .theme-row,
+html[data-theme="custom"] body label,
+html[data-theme="custom"] body .current-time{color:var(--fg)!important}
+html[data-theme="custom"] body input::placeholder,
+html[data-theme="custom"] body textarea::placeholder{color:var(--muted)!important;opacity:.9}
+html[data-theme="custom"] body .footer-note button{color:var(--accent)!important;background:transparent!important}
+.battery.earnings-mode{width:172px;min-width:172px;isolation:isolate}
+.battery.earnings-mode span{display:flex;align-items:center;justify-content:center;gap:2px;padding:0 6px;font-family:"Microsoft YaHei UI","Segoe UI Variable Text","Segoe UI",sans-serif;font-size:10.5px;font-weight:700;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:clip;text-shadow:0 1px 1px rgba(0,0,0,.9);transform:none;filter:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.battery.earnings-mode span strong{font:800 12px/1 "Segoe UI Variable Text","Segoe UI",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.01em;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.95)}
+.battery.earnings-mode canvas{filter:none}
+.display-mode-row{margin-bottom:12px}.earnings-settings{display:none;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 14px;padding:10px;border:1px solid color-mix(in srgb,var(--line) 65%,transparent);border-radius:8px;background:color-mix(in srgb,var(--bg) 76%,transparent)}
+.earnings-settings.active{display:grid}.earnings-settings label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:9px}.earnings-settings input{width:100%;height:29px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg,#fff);padding:0 7px;font:600 10px "Microsoft YaHei UI"}.earnings-settings .earnings-copy,.formula-preview{grid-column:1/-1}.formula-preview{color:var(--accent2);font-size:9px}.advanced-panel{overflow-y:auto}.advanced-card{margin-bottom:4px}
+html[data-theme="mono"] .battery.earnings-mode span,html[data-theme="mono"] .battery.earnings-mode span strong{text-shadow:none}

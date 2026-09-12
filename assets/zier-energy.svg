@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="50" x2="440" y2="470" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2878FF"/><stop offset="1" stop-color="#7A45EB"/>
+    </linearGradient>
+    <linearGradient id="energy" x1="126" y1="0" x2="392" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#56F4E2"/><stop offset="1" stop-color="#A3FF57"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-80%" width="200%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="url(#bg)"/>
+  <rect x="94" y="151" width="310" height="210" rx="50" fill="#10183A" fill-opacity=".82" stroke="white" stroke-width="22"/>
+  <path d="M414 209h18c20 0 36 16 36 36v22c0 20-16 36-36 36h-18z" fill="white"/>
+  <rect x="123" y="183" width="248" height="146" rx="27" fill="url(#energy)" opacity=".45" filter="url(#glow)"/>
+  <rect x="123" y="183" width="248" height="146" rx="27" fill="url(#energy)"/>
+  <path d="M303 185H190l79 62-72 80h116l-77-61z" fill="#172052" stroke="white" stroke-width="9" stroke-linejoin="round"/>
+</svg>
