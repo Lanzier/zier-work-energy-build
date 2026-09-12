@@ -28,6 +28,6 @@ jobs:
       - name: Publish installer to release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.4.2
-          name: Zier Work Energy Bar v2.4.2
+          tag_name: v2.5.0
+          name: Zier Work Energy Bar v2.5.0
           files: dist/*.exe
