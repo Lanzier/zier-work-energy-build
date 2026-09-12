@@ -1,6 +1,7 @@
 !include "nsDialogs.nsh"
 !include "WinMessages.nsh"
 
+!ifndef BUILD_UNINSTALLER
 !macro customWelcomePage
   Page custom zierWelcomeCreate zierWelcomeLeave
 !macroend
@@ -45,6 +46,7 @@ FunctionEnd
 
 Function zierWelcomeLeave
 FunctionEnd
+!endif
 
 !macro customHeader
   BrandingText "Zier 工作能量条 · v${VERSION}"
