@@ -1,6 +1,6 @@
 {
   "name": "zier-work-energy-bar",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "带城市天气、工作电量与 TweakCN 社区主题的桌面倒计时插件",
   "author": "Zier",
   "private": true,
@@ -25,7 +25,7 @@
     "win": {
       "target": [{ "target": "nsis", "arch": ["x64"] }],
       "icon": "assets/icon.ico",
-      "signAndEditExecutable": false,
+      "signAndEditExecutable": true,
       "artifactName": "Zier-Work-Energy-Bar-Setup-${version}-Windows-${arch}.${ext}"
     },
     "nsis": {

@@ -1,0 +1,33 @@
+name: Build Windows installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build Windows installer with application icon
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --win nsis --x64 --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Zier-Work-Energy-Bar-Windows-x64
+          path: dist/*.exe
+          if-no-files-found: error
+      - name: Publish installer to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.4.2
+          name: Zier Work Energy Bar v2.4.2
+          files: dist/*.exe

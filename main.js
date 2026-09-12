@@ -107,7 +107,7 @@ function createWindow() {
 }
 
 ipcMain.handle('open-external', (_event, url) => {
-  if (url === 'https://tweakcn.com/themes') return shell.openExternal(url);
+  if (url === 'https://tweakcn.com/community') return shell.openExternal(url);
   return false;
 });
 

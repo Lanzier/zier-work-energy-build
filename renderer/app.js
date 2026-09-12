@@ -145,7 +145,7 @@ $('endTime').addEventListener('change',e=>{state.end=e.target.value;save();updat
 $('weatherCity').addEventListener('change',e=>{state.city=e.target.value.trim();save();loadWeather();});
 $('locateWeather').addEventListener('click',()=>{state.city='';$('weatherCity').value='';save();loadWeather();});
 $('communityBtn').addEventListener('click',()=>{$('communityPanel').hidden=false;renderCommunity();});
-$('openTweakCN').addEventListener('click',()=>window.zierWidget.openExternal('https://tweakcn.com/themes'));
+$('openTweakCN').addEventListener('click',()=>window.zierWidget.openExternal('https://tweakcn.com/community'));
 $('closeCommunity').addEventListener('click',()=>{$('communityPanel').hidden=true;restoreCustomTheme();setTimeout(restoreCustomTheme,80);setTimeout(restoreCustomTheme,350);});
 $('advancedBtn').addEventListener('click',()=>{$('communityPanel').hidden=true;$('advancedPanel').hidden=false;});
 $('closeAdvanced').addEventListener('click',()=>{$('advancedPanel').hidden=true;restoreCustomTheme();});
