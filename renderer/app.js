@@ -1,7 +1,8 @@
 const $ = (id) => document.getElementById(id);
 const saved = JSON.parse(localStorage.getItem('zier-widget-settings') || '{}');
 if(saved.customTheme&&saved.themeSchema!==3){delete saved.customTheme;saved.theme='glass';localStorage.setItem('zier-widget-settings',JSON.stringify(saved));}
-const state = { expanded: false, start: saved.start || '09:00', end: saved.end || '18:00', theme: saved.theme || 'minecraft', effect: 'blocks', top: saved.top !== false, city: saved.city || '', energy: 100, widgetWidth: Math.min(720,Math.max(400,Number(saved.widgetWidth)||460)), widgetHeight: Math.min(72,Math.max(44,Number(saved.widgetHeight)||48)), direction: saved.direction==='up'?'up':'down', startup: Boolean(saved.startup), displayMode: saved.displayMode==='earnings'?'earnings':'energy', monthlySalary:Math.max(0,Number(saved.monthlySalary)||0), workDays:Math.min(31,Math.max(1,Number(saved.workDays)||22)), earningsLabel:String(saved.earningsLabel||'今天赚了 {amount} 元') };
+const hasLegacySchedule=Boolean(saved.start||saved.end);
+const state = { expanded: false, morningStart:saved.morningStart||saved.start||'09:00', morningEnd:Object.prototype.hasOwnProperty.call(saved,'morningEnd')?saved.morningEnd:(hasLegacySchedule?'':'12:00'), afternoonStart:Object.prototype.hasOwnProperty.call(saved,'afternoonStart')?saved.afternoonStart:(hasLegacySchedule?'':'13:00'), afternoonEnd:saved.afternoonEnd||saved.end||'18:00', theme: saved.theme || 'minecraft', effect: 'blocks', top: saved.top !== false, city: saved.city || '', energy: 100, widgetWidth: Math.min(720,Math.max(400,Number(saved.widgetWidth)||460)), widgetHeight: Math.min(72,Math.max(44,Number(saved.widgetHeight)||48)), direction: saved.direction==='up'?'up':'down', startup: Boolean(saved.startup), displayMode: saved.displayMode==='earnings'?'earnings':'energy', monthlySalary:Math.max(0,Number(saved.monthlySalary)||0), workDays:Math.min(31,Math.max(1,Number(saved.workDays)||22)), earningsLabel:String(saved.earningsLabel||'今天赚了 {amount} 元') };
 const communityThemes={
   catppuccin:{name:'Catppuccin',effect:'liquid',bg:'#1e1e2e',foreground:'#f4f4fb',panel:'#313244',line:'#585b70',accent:'#89b4fa',accent2:'#cba6f7',muted:'#bac2de',radius:'12px'},
   ocean:{name:'Ocean Breeze',effect:'liquid',bg:'#061c2b',foreground:'#f0fbff',panel:'#0b3045',line:'#28718c',accent:'#22d3ee',accent2:'#7dd3fc',muted:'#b7dce8',radius:'14px'},
@@ -20,15 +21,24 @@ const liquidBubbles=Array.from({length:12},(_,i)=>({
 }));
 let lastBubbleFrame=0;
 
-function minutes(value){ const [h,m]=value.split(':').map(Number); return h*60+m; }
+function minutes(value){ if(!value)return NaN;const [h,m]=value.split(':').map(Number); return h*60+m; }
 function pad(n){ return String(Math.max(0,n)).padStart(2,'0'); }
-function save(){ localStorage.setItem('zier-widget-settings',JSON.stringify({start:state.start,end:state.end,theme:state.theme,top:state.top,city:state.city,widgetWidth:state.widgetWidth,widgetHeight:state.widgetHeight,direction:state.direction,startup:state.startup,displayMode:state.displayMode,monthlySalary:state.monthlySalary,workDays:state.workDays,earningsLabel:state.earningsLabel,customTheme:saved.customTheme,themeSchema:3})); }
-function secondsPerWorkday(){return Math.max(1,(minutes(state.end)-minutes(state.start))*60);}
+function save(){ localStorage.setItem('zier-widget-settings',JSON.stringify({morningStart:state.morningStart,morningEnd:state.morningEnd,afternoonStart:state.afternoonStart,afternoonEnd:state.afternoonEnd,theme:state.theme,top:state.top,city:state.city,widgetWidth:state.widgetWidth,widgetHeight:state.widgetHeight,direction:state.direction,startup:state.startup,displayMode:state.displayMode,monthlySalary:state.monthlySalary,workDays:state.workDays,earningsLabel:state.earningsLabel,customTheme:saved.customTheme,themeSchema:3})); }
+function workPeriods(){
+  const first=minutes(state.morningStart),last=minutes(state.afternoonEnd);
+  if(!Number.isFinite(first)||!Number.isFinite(last)||last<=first)return[];
+  const amEnd=minutes(state.morningEnd),pmStart=minutes(state.afternoonStart);
+  if(Number.isFinite(amEnd)&&Number.isFinite(pmStart)&&amEnd>first&&pmStart>=amEnd&&last>pmStart)return[[first,amEnd],[pmStart,last]];
+  return[[first,last]];
+}
+function secondsPerWorkday(){return Math.max(1,workPeriods().reduce((sum,[start,end])=>sum+(end-start)*60,0));}
+function workedSecondsAt(now=new Date()){
+  const nowSeconds=now.getHours()*3600+now.getMinutes()*60+now.getSeconds()+now.getMilliseconds()/1000;
+  return workPeriods().reduce((sum,[start,end])=>sum+Math.max(0,Math.min(end*60,nowSeconds)-start*60),0);
+}
 function earningsPerSecond(){return state.monthlySalary/state.workDays/secondsPerWorkday();}
 function earningsAmountAt(now=new Date()){
-  const nowSeconds=now.getHours()*3600+now.getMinutes()*60+now.getSeconds()+now.getMilliseconds()/1000;
-  const startSeconds=minutes(state.start)*60;
-  return Math.min(secondsPerWorkday(),Math.max(0,nowSeconds-startSeconds))*earningsPerSecond();
+  return workedSecondsAt(now)*earningsPerSecond();
 }
 function prepareEarningsText(){
   const template=state.earningsLabel||'{amount}';if(template===earningsTemplate&&$('earningAmount'))return;
@@ -59,12 +69,14 @@ function applyDirection(){
 }
 function updateClock(){
   const now=new Date(), nowMin=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
-  const start=minutes(state.start), end=minutes(state.end), duration=Math.max(1,end-start);
+  const periods=workPeriods(),start=periods[0]?.[0]??0,end=periods.at(-1)?.[1]??0,totalSeconds=secondsPerWorkday();
   let label, energy;
-  if(nowMin<start){ label=`距离上班 ${pad(Math.floor((start-nowMin)/60))}:${pad(Math.floor((start-nowMin)%60))}`; energy=100; }
+  if(!periods.length){label='请设置工作时间';energy=100;}
+  else if(nowMin<start){ label=`距离上班 ${pad(Math.floor((start-nowMin)/60))}:${pad(Math.floor((start-nowMin)%60))}`; energy=100; }
   else if(nowMin>=end){ label='今天下班啦 · 好好休息'; energy=0; }
-  else { const left=(end-nowMin)*60; label=`还有 ${pad(Math.floor(left/3600))}:${pad(Math.floor(left%3600/60))}:${pad(Math.floor(left%60))} 下班`; energy=((end-nowMin)/duration)*100; }
-  $('countdown').textContent=label; $('schedule').textContent=`${state.start} — ${state.end}`;$('currentTime').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  else { const inBreak=periods.length===2&&nowMin>=periods[0][1]&&nowMin<periods[1][0],left=(end-nowMin)*60;if(inBreak){const until=periods[1][0]-nowMin;label=`午休中 · ${pad(Math.floor(until/60))}:${pad(Math.floor(until%60))} 后上班`;}else label=`还有 ${pad(Math.floor(left/3600))}:${pad(Math.floor(left%3600/60))}:${pad(Math.floor(left%60))} 下班`;energy=(1-workedSecondsAt(now)/totalSeconds)*100; }
+  const schedule=periods.length===2?`${state.morningStart}–${state.morningEnd} · ${state.afternoonStart}–${state.afternoonEnd}`:`${state.morningStart||'--:--'} — ${state.afternoonEnd||'--:--'}（无午休）`;
+  $('countdown').textContent=label; $('schedule').textContent=schedule;$('currentTime').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
   energy=Math.min(100,Math.max(0,energy));
   energy=state.direction==='up'?100-energy:energy;
   state.energy=energy;
@@ -137,11 +149,10 @@ function animateBattery(now){
   animateEarningsAmount();requestAnimationFrame(animateBattery);
 }
 
-$('startTime').value=state.start; $('endTime').value=state.end; $('weatherCity').value=state.city; $('alwaysOnTop').checked=state.top; $('autoStartup').checked=state.startup; applyTheme(state.theme); applyWidgetSize(); updateEarningsSettings(); applyDirection();
+$('morningStart').value=state.morningStart;$('morningEnd').value=state.morningEnd;$('afternoonStart').value=state.afternoonStart;$('afternoonEnd').value=state.afternoonEnd; $('weatherCity').value=state.city; $('alwaysOnTop').checked=state.top; $('autoStartup').checked=state.startup; applyTheme(state.theme); applyWidgetSize(); updateEarningsSettings(); applyDirection();
 $('expandBtn').addEventListener('click',()=>{toggle(!state.expanded);if(!state.expanded)loadWeather();});
 $('closeBtn').addEventListener('click',()=>window.zierWidget.close());
-$('startTime').addEventListener('change',e=>{state.start=e.target.value;save();updateClock();});
-$('endTime').addEventListener('change',e=>{state.end=e.target.value;save();updateClock();});
+for(const id of ['morningStart','morningEnd','afternoonStart','afternoonEnd'])$(id).addEventListener('change',e=>{state[id]=e.target.value;save();updateEarningsSettings();updateClock();});
 $('weatherCity').addEventListener('change',e=>{state.city=e.target.value.trim();save();loadWeather();});
 $('locateWeather').addEventListener('click',()=>{state.city='';$('weatherCity').value='';save();loadWeather();});
 $('communityBtn').addEventListener('click',()=>{$('communityPanel').hidden=false;renderCommunity();});

@@ -28,11 +28,13 @@
 
       <div class="settings">
         <div class="section-title"><b>插件设置</b><span>自动保存</span></div>
-        <div class="time-row">
-          <label>上班<input type="time" id="startTime" value="09:00"></label>
-          <span>→</span>
-          <label>下班<input type="time" id="endTime" value="18:00"></label>
+        <div class="worktime-grid">
+          <label>上午上班<input type="time" id="morningStart" value="09:00"></label>
+          <label>上午下班<input type="time" id="morningEnd" value="12:00"></label>
+          <label>下午上班<input type="time" id="afternoonStart" value="13:00"></label>
+          <label>下午下班<input type="time" id="afternoonEnd" value="18:00"></label>
         </div>
+        <small class="worktime-tip">只填“上午上班”和“下午下班”时，按无午休连续工作计算。</small>
         <div class="location-row"><label>天气城市<input id="weatherCity" placeholder="留空即自动定位"></label><button id="locateWeather" title="重新自动定位">📍</button></div>
         <label class="toggle-row"><span><b>桌面置顶</b><small>始终显示在其他窗口上方</small></span><input type="checkbox" id="alwaysOnTop" checked><i></i></label>
         <div class="theme-row"><span>主题风格</span><div class="theme-pills"><button data-theme="minecraft" class="active">方块世界</button><button data-theme="glass">蓝紫玻璃</button><button data-theme="mono">极简黑白</button><button id="communityBtn">社区＋</button></div></div>
